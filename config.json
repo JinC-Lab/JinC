@@ -1,0 +1,160 @@
+{
+  "title": "锦程分享",
+  "quote": "顺其自然，岁岁平安顺遂",
+  "bgImage": "./Picture/bjt.jpg",
+  "logo": "./Picture/logo.jpg",
+  "bgm": "./xxxt.mp3",
+  "sections": [
+    {
+      "id": "section1",
+      "title": "空壳接口",
+      "subtitle": "复制下方地址到空壳软件配置中即可使用",
+      "icon": "./Picture/box.png",
+      "items": [
+        {
+          "type": "modal",
+          "title": "摸鱼接口",
+          "tag": "摸鱼",
+          "icon": "./Picture/moyuer.jpg",
+          "link": "https://6800.kstore.vip/fish.json",
+          "modalTitle": "摸鱼接口",
+          "modalDesc": "摸鱼接口地址",
+          "modalIcon": "./Picture/moyuer.jpg"
+        },
+        {
+          "type": "modal",
+          "title": "嗷呜接口",
+          "tag": "嗷呜",
+          "icon": "./Picture/logo.jpg",
+          "link": "https://9763.kstore.space/aowu.json",
+          "modalTitle": "嗷呜接口",
+          "modalDesc": "嗷呜接口地址",
+          "modalIcon": "./Picture/logo.jpg"
+        },
+        {
+          "type": "modal",
+          "title": "潇洒接口",
+          "tag": "潇洒",
+          "icon": "./Picture/xs.jpg",
+          "link": "https://9877.kstore.space/ONE/one.json",
+          "modalTitle": "潇洒接口",
+          "modalDesc": "潇洒接口地址",
+          "modalIcon": "./Picture/xs.jpg"
+        },
+        {
+          "type": "modal",
+          "title": "小虎斑接口",
+          "tag": "小虎斑",
+          "icon": "./Picture/1111.jpg",
+          "link": "http://hb.小虎斑.site:25252/仅供测试/",
+          "modalTitle": "小虎斑接口",
+          "modalDesc": "小虎斑接口地址",
+          "modalIcon": "./Picture/1111.jpg"
+        }
+      ]
+    },
+    {
+      "id": "section2",
+      "title": "软件下载",
+      "subtitle": "配套推荐软件下载地址",
+      "icon": "./Picture/下载.png",
+      "items": [
+        {
+          "type": "link",
+          "title": "极速下载",
+          "tag": "下载通道①",
+          "icon": "./Picture/okicon.png",
+          "link": "https://pan.quark.cn/s/2c0f2f8a731a"
+        },
+        {
+          "type": "modal",
+          "title": "高速下载",
+          "tag": "下载通道②",
+          "icon": "./Picture/logo.jpg",
+          "link": "https://pan.baidu.com/s/1-QZF9ZJCOEd5nWwQ5FCWoQ",
+          "modalTitle": "高速下载",
+          "modalDesc": "提取码：7vby",
+          "modalIcon": "./Picture/logo.jpg"
+        },
+        {
+          "type": "link",
+          "title": "快速下载",
+          "tag": "下载通道③",
+          "icon": "./Picture/logo.jpg",
+          "link": "https://drive.uc.cn/s/1366a0cbe9844"
+        },
+        {
+          "type": "detail",
+          "title": "待更新",
+          "tag": "维护中",
+          "icon": "./Picture/logo.jpg",
+          "detailContent": "# 手机空壳\n安卓专用本地播放器，[点击下载](https://app.example.com/mobile)\n![图片](./Picture/logo.jpg)"
+        }
+      ]
+    },
+    {
+      "id": "section3",
+      "title": "交流群组",
+      "subtitle": "锦程分享交流群，来交个朋友吧",
+      "icon": "./Picture/群组.png",
+      "items": [
+        {
+          "type": "link",
+          "title": "锦程交流群",
+          "tag": "QQ群",
+          "icon": "./Picture/logo.jpg",
+          "link": "https://qm.qq.com/q/ou0ZMeFMty",
+          "modalTitle": "摸鱼公众号",
+          "modalDesc": "扫码关注获取最新资源",
+          "modalIcon": "./Picture/logo.jpg"
+        }
+      ]
+    },
+    {
+      "id": "section4",
+      "title": "相关工具",
+      "subtitle": "壳子相关工具推荐",
+      "icon": "./Picture/工具-2.png",
+      "items": [
+        {
+          "type": "link",
+          "title": "摸鱼解密工具",
+          "tag": "解密",
+          "icon": "./Picture/moyuer.jpg",
+          "link": "http://www.小不点.com/helper/",
+          "modalTitle": "接口解密工具",
+          "modalDesc": "一键还原加密配置",
+          "modalIcon": "./Picture/logo.jpg"
+        }
+      ]
+    },
+    {
+      "id": "section1782100791502",
+      "title": "友链分享",
+      "subtitle": "优质站点，友情互联",
+      "icon": "./Picture/youlian.png",
+      "items": [
+        {
+          "type": "link",
+          "title": "摸鱼主页",
+          "tag": "摸鱼",
+          "icon": "./Picture/moyuer.jpg",
+          "link": "http://www.小不点.com/",
+          "modalTitle": "新卡片",
+          "modalDesc": "",
+          "modalIcon": "./Picture/logo.jpg"
+        },
+        {
+          "type": "link",
+          "title": "东方AI导航",
+          "tag": "东方",
+          "icon": "./Picture/donfang.jpg",
+          "link": "https://flowus.cn/dongfang/share/3fd6305e-5531-43de-956e-01e82b65e976",
+          "modalTitle": "新卡片",
+          "modalDesc": "",
+          "modalIcon": "./Picture/logo.jpg"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>锦程分享</title>
+    <link rel="shortcut icon" href="./Picture/logo.jpg" type="image/jpeg">
+    <script src="./marked.min.js" onerror="alert('marked.min.js 加载失败，请检查文件')"></script>
+    <script>
+        if (typeof marked === 'undefined') alert('marked.min.js 未正确加载，请重新下载该文件');
+    </script>
+    <style>
+        :root {
+            --text-main: #2c3e50;
+            --text-sub: #546e7a;
+            --text-light: #90a4ae;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: rgba(0, 0, 0, 0.04);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --btn-bg: rgba(255, 255, 255, 0.7);
+            --bg-image: url('./Picture/bjt.jpg');
+        }
+        [data-theme="dark"] {
+            --text-main: #f8f9fa;
+            --text-sub: #ced4da;
+            --text-light: #adb5bd;
+            --glass-bg: rgba(20, 20, 30, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.2);
+            --card-bg: rgba(40, 40, 50, 0.8);
+            --btn-bg: rgba(50, 50, 60, 0.6);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif; -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; outline:none; }
+        body,html { width:100%; height:100%; overflow:hidden; }
+        .app-container { width:100%; max-width:480px; height:100%; position:relative; overflow:hidden; margin:0 auto; background:transparent; }
+        .bg-layer { position:fixed; top:0; left:0; right:0; bottom:0; background-image:var(--bg-image); background-size:cover; background-position:center; z-index:-2; }
+        #splash-screen { position:fixed; top:0; left:0; width:100%; height:100%; background:inherit; backdrop-filter:blur(15px); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; transition:opacity 0.5s,transform 0.5s; cursor:pointer; }
+        .splash-logo { width:96px; height:96px; border-radius:22px; box-shadow:0 12px 30px rgba(0,0,0,0.08); margin-bottom:24px; object-fit:cover; }
+        .splash-title { font-size:26px; font-weight:700; color:var(--text-main); margin-bottom:12px; }
+        .splash-quote { font-size:14px; color:var(--text-sub); margin-bottom:50px; }
+        .splash-hint { position:absolute; bottom:45px; font-size:12px; color:var(--text-light); display:flex; flex-direction:column; align-items:center; gap:6px; animation:breathe 2s infinite; }
+        @keyframes breathe { 0%,100%{opacity:0.4;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
+        #main-content { width:100%; height:100%; display:none; overflow-y:auto; overflow-x:hidden; padding-bottom:20px; opacity:0; transform:scale(0.97); transition:opacity 0.5s,transform 0.5s; }
+        #main-content.active { opacity:1; transform:scale(1); }
+        .top-nav { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; position:relative; z-index:10; }
+        .icon-btn { width:34px; height:34px; border-radius:12px; background:transparent; border:none; display:flex; justify-content:center; align-items:center; color:var(--text-main); cursor:pointer; transition:transform 0.2s, background 0.2s; -webkit-tap-highlight-color:transparent; outline:none; padding:0; }
+        .icon-btn:active { transform:scale(0.92); background:rgba(150,150,150,0.1); }
+        .icon-btn svg { width:16px; height:16px; fill:var(--text-main); }
+        .btn-group { display:flex; gap:2px; background:var(--btn-bg); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-radius:14px; padding:3px; border:1px solid var(--glass-border); box-shadow:0 4px 15px var(--glass-shadow); -webkit-tap-highlight-color:transparent; }
+        .btn-group .icon-btn { width:34px; height:34px; border-radius:10px; background:transparent; box-shadow:none; border:none; }
+        #menu-btn { width:42px; height:42px; border-radius:14px; background:var(--btn-bg); backdrop-filter:blur(12px); border:1px solid var(--glass-border); box-shadow:0 4px 15px var(--glass-shadow); }
+        #menu-btn svg { width:18px; height:18px; }
+        .clock-container { text-align:center; margin:10px 0 25px; color:var(--text-main); }
+        .time-display { font-size:68px; font-weight:300; line-height:1; margin-bottom:12px; }
+        .date-display { display:inline-block; padding:6px 18px; background:rgba(0,0,0,0.05); color:var(--text-sub); backdrop-filter:blur(10px); border-radius:20px; font-size:13px; border:1px solid var(--glass-border); }
+        .search-box { margin:0 20px 20px; background:var(--card-bg); backdrop-filter:blur(15px); border-radius:16px; padding:14px 20px; display:flex; align-items:center; box-shadow:0 4px 20px rgba(0,0,0,0.05); border:1px solid var(--glass-border); }
+        .search-box svg { width:16px; height:16px; flex-shrink:0; margin-right:12px; fill:var(--text-light); }
+        .search-box input { border:none; background:transparent; outline:none; width:100%; font-size:15px; color:var(--text-main); }
+        .category-section { background:var(--glass-bg); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:24px; margin:0 20px 20px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.05); }
+        .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .header-left { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+        .header-icon-img { width:20px; height:20px; object-fit:contain; flex-shrink:0; }
+        .header-title-box { display:flex; flex-direction:column; min-width:0; flex:1; }
+        .header-title { font-size:16px; font-weight:600; color:var(--text-main); }
+        .header-subtitle { font-size:12px; color:var(--text-light); margin-top:3px; word-break:break-word; }
+        .item-count { background:rgba(150,150,150,0.15); color:var(--text-sub); padding:3px 10px; border-radius:12px; font-size:12px; font-weight:500; margin-left:10px; }
+        .divider { height:1px; background:rgba(0,0,0,0.06); margin-bottom:16px; }
+        .cards-grid { display:grid; grid-template-columns:1fr; gap:12px; width:100%; }
+        .card { background:var(--card-bg); border-radius:16px; padding:12px 14px; display:flex; align-items:center; gap:12px; box-shadow:0 4px 15px var(--glass-shadow); border:1px solid var(--glass-border); cursor:pointer; transition:transform 0.2s; -webkit-tap-highlight-color:transparent; }
+        .card:active { transform:scale(0.96); }
+        .card-icon { width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; background:#eee; }
+        .card-info { flex:1; min-width:0; }
+        .card-title { font-size:14px; font-weight:600; color:var(--text-main); word-break:break-word; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .card-tag { font-size:10px; padding:2px 8px; border-radius:6px; display:inline-block; margin-top:4px; font-weight:500; white-space:nowrap; background:rgba(150,150,150,0.15); color:var(--text-sub); }
+        .card-action { width:24px; height:24px; border-radius:8px; background:rgba(150,150,150,0.1); display:flex; justify-content:center; align-items:center; color:var(--text-light); flex-shrink:0; cursor:pointer; }
+        .card-action svg { width:12px; height:12px; fill:var(--text-light); }
+        .card-action:active { transform:scale(0.92); background:rgba(150,150,150,0.2); }
+
+        .sidebar-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); z-index:1000; opacity:0; visibility:hidden; transition:0.3s; }
+        .sidebar {
+            position:fixed; top:0; left:-80%; width:75%; max-width:320px; height:100%;
+            background:var(--glass-bg); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
+            z-index:1001; transition:left 0.4s cubic-bezier(0.2,0.8,0.2,1);
+            border-right:1px solid var(--glass-border);
+            display:flex; flex-direction:column; padding:40px 20px;
+            color:var(--text-main);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sidebar.active { left:0; }
+        .sidebar-overlay.active { opacity:1; visibility:visible; }
+        .sidebar-header { text-align:center; margin-bottom:40px; }
+        .sidebar-logo { width:72px; height:72px; border-radius:18px; margin-bottom:12px; }
+        .sidebar-title { font-size:18px; font-weight:600; }
+        .sidebar-menu { list-style:none; display:flex; flex-direction:column; gap:12px; }
+        .sidebar-menu li { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--card-bg); border-radius:14px; cursor:pointer; border:1px solid var(--glass-border); }
+        .sidebar-menu li:active { transform:scale(0.98); }
+        .menu-left { display:flex; align-items:center; gap:12px; font-size:15px; }
+        .menu-icon-img { width:18px; height:18px; object-fit:contain; }
+        .menu-count { background:rgba(150,150,150,0.15); padding:2px 8px; border-radius:10px; font-size:12px; }
+
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); z-index:2000; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition:0.3s; }
+        .modal-overlay.active { opacity:1; visibility:visible; }
+        .modal-content { background:var(--card-bg); width:85%; max-width:320px; border-radius:24px; padding:24px; text-align:center; position:relative; transform:scale(0.95); transition:transform 0.3s; box-shadow:0 15px 40px rgba(0,0,0,0.15); border:1px solid var(--glass-border); }
+        .modal-overlay.active .modal-content { transform:scale(1); }
+        .modal-close { position:absolute; top:16px; right:16px; cursor:pointer; width:32px; height:32px; border-radius:50%; background:rgba(150,150,150,0.1); display:flex; justify-content:center; align-items:center; border:none; }
+        .modal-close:active { transform:scale(0.9); }
+        .modal-close svg { width:16px; height:16px; fill:var(--text-light); }
+        .modal-icon { width:64px; height:64px; border-radius:16px; margin-bottom:16px; }
+        .modal-title { font-size:18px; font-weight:600; margin-bottom:6px; color:var(--text-main); }
+        .modal-desc { font-size:13px; color:var(--text-sub); margin-bottom:20px; }
+        .modal-link-box { background:rgba(150,150,150,0.1); padding:12px; border-radius:12px; font-size:12px; color:var(--text-sub); margin-bottom:20px; word-break:break-all; }
+        .modal-btns { display:flex; gap:12px; }
+        .modal-btn { flex:1; padding:12px 0; border-radius:14px; border:none; font-size:14px; font-weight:600; cursor:pointer; }
+        .modal-btn:active { transform:scale(0.95); }
+        .btn-copy { background:#f1f3f5; color:#495057; }
+        .btn-visit { background:#00bcd4; color:#fff; }
+
+        .toast {
+            position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+            background:var(--card-bg); backdrop-filter:blur(15px); color:var(--text-main);
+            padding:10px 20px; border-radius:24px; box-shadow:0 10px 25px rgba(0,0,0,0.15);
+            border:1px solid var(--glass-border); z-index:9999; display:none;
+            align-items:center; gap:8px; font-weight:500; font-size:13px; white-space:nowrap;
+        }
+        .toast.show { display:flex; animation:fadeInBottom 0.3s ease; }
+        @keyframes fadeInBottom { from{opacity:0;transform:translateX(-50%) translateY(10px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+        .detail-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--card-bg); backdrop-filter:blur(20px); z-index:3000; display:none; flex-direction:column; overflow-y:auto; }
+        .detail-overlay.active { display:flex; }
+        .detail-header { padding:16px 20px; font-size:14px; color:var(--text-sub); border-bottom:1px solid var(--glass-border); display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .detail-header span { cursor:pointer; color:var(--text-main); }
+        .detail-body { padding:20px; color:var(--text-main); line-height:1.6; flex:1; }
+        .detail-body img { max-width:100%; border-radius:10px; margin:10px 0; }
+        audio { display:none; }
+
+        .site-footer {
+            text-align:center; padding:20px 15px; margin:10px 20px 20px;
+            font-size:12px; color:var(--text-light); background:var(--glass-bg);
+            backdrop-filter:blur(15px); border-radius:18px; border:1px solid var(--glass-border);
+            box-shadow:0 4px 15px var(--glass-shadow); opacity:0.8;
+        }
+
+        .admin-panel { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:none; overflow-y:auto; color:#fff; padding:20px; }
+        .admin-panel.active { display:block; }
+        .admin-section { background:rgba(255,255,255,0.08); border-radius:12px; margin:10px 0; }
+        .admin-section-header { padding:12px 15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:bold; background:rgba(255,255,255,0.05); border-radius:12px; }
+        .admin-section-body { display:none; padding:10px 15px 15px; }
+        .admin-section.open .admin-section-body { display:block; }
+        .admin-card { background:rgba(255,255,255,0.04); margin:8px 0; border-radius:8px; }
+        .admin-card-header { padding:8px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+        .admin-card-body { display:none; padding:8px 12px 12px; }
+        .admin-card.open .admin-card-body { display:block; }
+        .admin-panel label { display:block; margin-top:8px; font-size:13px; opacity:0.8; }
+        .admin-panel input,.admin-panel textarea,.admin-panel select { width:100%; padding:6px; margin-top:3px; border-radius:6px; border:none; background:rgba(255,255,255,0.1); color:#fff; }
+        .admin-panel button { margin-top:8px; padding:6px 14px; border:none; border-radius:8px; background:#00bcd4; color:#fff; font-weight:bold; cursor:pointer; }
+        .admin-panel button:active { transform:scale(0.95); }
+        .admin-panel .del-btn { background:#e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <audio id="bgm" src="" preload="auto" loop></audio>
+        <div class="bg-layer"></div>
+
+        <!-- 引导页 -->
+        <div id="splash-screen">
+            <img id="splashLogo" src="" alt="Logo" class="splash-logo" onerror="this.style.background='#ccc'">
+            <div class="splash-title" id="splashTitle"></div>
+            <div class="splash-quote" id="splashQuote"></div>
+            <div class="splash-hint">
+                <span>点击任意位置进入</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--text-light)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img id="sidebarLogo" src="" alt="Logo" class="sidebar-logo" onerror="this.style.background='#ccc'">
+                <div class="sidebar-title"></div>
+            </div>
+            <ul class="sidebar-menu" id="sidebarMenu"></ul>
+        </div>
+
+        <!-- 主内容 -->
+        <div id="main-content">
+            <div class="top-nav">
+                <div class="icon-btn" id="menu-btn">
+                    <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+                </div>
+                <div class="btn-group">
+                    <div class="icon-btn" id="theme-btn">
+                        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+                    </div>
+                    <div class="icon-btn" id="sound-btn">
+                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </div>
+                    <div class="icon-btn" id="setting-btn">
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81a.484.484 0 0 0-.41-.3h-3.98c-.19 0-.36.11-.43.27l-.94 3.27c-.59.24-1.13.57-1.62.94l-2.39-.96a.488.488 0 0 0-.59.22L2.1 9.47c-.11.19-.06.43.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.94 3.27c.07.16.23.28.43.28h3.98c.19 0 .36-.11.43-.27l.94-3.27c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.11-.19.06-.43-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="clock-container">
+                <div class="time-display" id="time-display">00:00</div>
+                <div class="date-display" id="date-display">加载中...</div>
+            </div>
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" placeholder="搜索导航链接、分类..." id="search-input">
+            </div>
+            <div id="categories-container"></div>
+            <div class="site-footer">© 2026 JinC. All Rights Reserved.</div>
+        </div>
+
+        <!-- 弹窗 -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+                <img src="" class="modal-icon" id="modal-icon">
+                <h3 class="modal-title" id="modal-title"></h3>
+                <p class="modal-desc" id="modal-desc"></p>
+                <div class="modal-link-box">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--text-sub)"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                    <span id="modal-link-text"></span>
+                </div>
+                <div class="modal-btns">
+                    <button class="modal-btn btn-copy" onclick="copyModalLink()">复制</button>
+                    <button class="modal-btn btn-visit" onclick="visitModalLink()">访问</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 复制成功提示 -->
+        <div class="toast" id="toast">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#00c853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <span id="toastText">链接已复制到剪贴板</span>
+        </div>
+
+        <!-- 详情页 -->
+        <div class="detail-overlay" id="detailOverlay">
+            <div class="detail-header" id="detailBreadcrumb"></div>
+            <div class="divider"></div>
+            <div class="detail-body" id="detailBody"></div>
+        </div>
+
+        <!-- 后台编辑器 -->
+        <div class="admin-panel" id="adminPanel">
+            <h2>后台编辑</h2>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button onclick="applyAdminChanges()">应用修改</button>
+                <button onclick="downloadJSON()">下载JSON文件</button>
+                <button onclick="closeAdmin()">关闭</button>
+            </div>
+            <label>网站标题</label>
+            <input type="text" id="adminTitle">
+            <label>引导语</label>
+            <input type="text" id="adminQuote">
+            <label>背景音乐链接</label>
+            <input type="text" id="adminBgm">
+            <div id="adminSections"></div>
+            <button onclick="addSection()">➕ 添加分类</button>
+        </div>
+    </div>
+
+    <script>
+        // 内嵌默认配置，当无法加载 config.json 时使用
+        const defaultConfig = {
+            "title": "锦程分享",
+            "quote": "顺其自然，岁岁平安顺遂",
+            "bgImage": "./Picture/bjt.jpg",
+            "logo": "./Picture/logo.jpg",
+            "bgm": "./xxxt.mp3",
+            "sections": [
+                {
+                    "id": "section1",
+                    "title": "空壳接口",
+                    "subtitle": "复制下方地址到空壳软件配置中即可使用",
+                    "icon": "./Picture/box.png",
+                    "items": [
+                        {
+                            "type": "modal",
+                            "title": "摸鱼接口",
+                            "tag": "摸鱼",
+                            "icon": "./Picture/moyuer.jpg",
+                            "link": "https://6800.kstore.vip/fish.json",
+                            "modalTitle": "摸鱼接口",
+                            "modalDesc": "摸鱼接口地址",
+                            "modalIcon": "./Picture/moyuer.jpg"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let config = JSON.parse(JSON.stringify(defaultConfig));
+
+        // 尝试从 config.json 加载配置
+        fetch('./config.json')
+            .then(response => {
+                if (!response.ok) throw new Error('配置文件不存在');
+                return response.json();
+            })
+            .then(data => {
+                config = data;
+                initApp();
+            })
+            .catch(() => {
+                console.warn('未能加载 config.json，使用默认配置');
+                initApp();
+            });
+
+        function initApp() {
+            const bgmEl = document.getElementById('bgm');
+            if (bgmEl) bgmEl.src = config.bgm || './xxxt.mp3';
+            window.config = config;
+            renderAll();
+        }
+
+        function getEl(id) { return document.getElementById(id); }
+
+        function showToast(msg) {
+            const toast = getEl('toast');
+            const toastText = getEl('toastText');
+            if (!toast || !toastText) return;
+            toastText.innerText = msg || '链接已复制到剪贴板';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function svgIcon(type) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('width', '16');
+            svg.setAttribute('height', '16');
+            svg.style.fill = 'var(--text-light)';
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const icons = {
+                copy: 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z',
+                link: 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
+                info: 'M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z'
+            };
+            path.setAttribute('d', icons[type] || icons.copy);
+            svg.appendChild(path);
+            return svg;
+        }
+
+        function renderAll() {
+            document.title = config.title;
+            const splashLogo = getEl('splashLogo');
+            if (splashLogo) splashLogo.src = config.logo;
+            const splashTitle = getEl('splashTitle');
+            if (splashTitle) splashTitle.innerText = config.title;
+            const splashQuote = getEl('splashQuote');
+            if (splashQuote) splashQuote.innerText = config.quote;
+            const sidebarLogo = getEl('sidebarLogo');
+            if (sidebarLogo) sidebarLogo.src = config.logo;
+            const sidebarTitle = document.querySelector('.sidebar-title');
+            if (sidebarTitle) sidebarTitle.innerText = config.title;
+            const bgLayer = document.querySelector('.bg-layer');
+            if (bgLayer) bgLayer.style.backgroundImage = `url(${config.bgImage})`;
+            const bgmEl = getEl('bgm');
+            if (bgmEl) bgmEl.src = config.bgm;
+
+            const sidebarMenu = getEl('sidebarMenu');
+            if (sidebarMenu) {
+                sidebarMenu.innerHTML = '';
+                config.sections.forEach(sec => {
+                    const li = document.createElement('li');
+                    li.onclick = () => scrollToSection(sec.id);
+                    li.innerHTML = `<div class="menu-left"><img src="${sec.icon}" class="menu-icon-img"><span>${sec.title}</span></div><span class="menu-count">${sec.items.length}项</span>`;
+                    sidebarMenu.appendChild(li);
+                });
+            }
+
+            const categoriesContainer = getEl('categories-container');
+            if (categoriesContainer) {
+                categoriesContainer.innerHTML = '';
+                config.sections.forEach(sec => {
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'category-section';
+                    secDiv.id = sec.id;
+                    secDiv.innerHTML = `
+                        <div class="section-header">
+                            <div class="header-left"><img src="${sec.icon}" class="header-icon-img"><div class="header-title-box"><span class="header-title">${sec.title}</span><span class="header-subtitle">${sec.subtitle}</span></div></div>
+                            <div class="item-count">${sec.items.length}项</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="cards-grid"></div>
+                    `;
+                    const cardsGrid = secDiv.querySelector('.cards-grid');
+                    sec.items.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `<img src="${item.icon}" class="card-icon"><div class="card-info"><div class="card-title">${item.title}</div><div class="card-tag">${item.tag}</div></div><div class="card-action"></div>`;
+                        const action = card.querySelector('.card-action');
+                        if (item.type === 'link') {
+                            card.onclick = () => window.open(item.link, '_blank');
+                            action.appendChild(svgIcon('link'));
+                            action.onclick = (e) => { e.stopPropagation(); window.open(item.link, '_blank'); };
+                        } else if (item.type === 'detail') {
+                            card.onclick = () => openDetail(sec.title, item.title, item.detailContent || '');
+                            action.appendChild(svgIcon('info'));
+                            action.onclick = (e) => { e.stopPropagation(); openDetail(sec.title, item.title, item.detailContent || ''); };
+                        } else {
+                            card.onclick = () => openModal(item.modalTitle || item.title, item.modalDesc || '', item.link, item.modalIcon || item.icon);
+                            action.appendChild(svgIcon('copy'));
+                            action.onclick = (e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(item.link).then(() => {
+                                    showToast('链接已复制到剪贴板');
+                                }).catch(err => alert('复制失败'));
+                            };
+                        }
+                        cardsGrid.appendChild(card);
+                    });
+                    categoriesContainer.appendChild(secDiv);
+                });
+            }
+
+            document.querySelectorAll('.card-tag').forEach(tag => {
+                const colors = ['#e3f2fd,#1565c0','#e8f5e9,#2e7d32','#fff3e0,#ef6c00','#fce4ec,#c2185b','#f3e5f5,#7b1fa2','#e0f7fa,#00838f'];
+                const c = colors[Math.floor(Math.random()*colors.length)].split(',');
+                tag.style.backgroundColor = c[0]; tag.style.color = c[1];
+            });
+        }
+
+        const splash = getEl('splash-screen');
+        const main = getEl('main-content');
+        let musicPlaying = false;
+
+        function tryPlayMusic() {
+            const bgm = getEl('bgm');
+            if (!bgm) return;
+            bgm.load();
+            bgm.play().then(() => {
+                musicPlaying = true;
+                updateSoundIcon();
+            }).catch(err => {
+                console.warn('自动播放失败：', err.message);
+                musicPlaying = false;
+                updateSoundIcon();
+                if (!getEl('toast').classList.contains('show')) {
+                    showToast('🎵 点击声音图标播放音乐');
+                }
+            });
+        }
+
+        if (splash) {
+            splash.addEventListener('click', () => {
+                splash.style.opacity='0'; splash.style.transform='scale(1.05)';
+                tryPlayMusic();
+                setTimeout(()=>{
+                    splash.style.display='none';
+                    if(main) { main.style.display='block'; main.classList.add('active'); }
+                }, 400);
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const td = getEl('time-display');
+            const dd = getEl('date-display');
+            if(td) td.innerText = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            if(dd) {
+                const days = ['周日','周一','周二','周三','周四','周五','周六'];
+                dd.innerHTML = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]} &middot; ${now.getHours()>=6&&now.getHours()<18?'白天':'夜间'}`;
+            }
+        }
+        setInterval(updateClock,1000); updateClock();
+
+        const menuBtn = getEl('menu-btn');
+        const sidebarEl = getEl('sidebar');
+        const sidebarOverlayEl = getEl('sidebar-overlay');
+        if(menuBtn) menuBtn.onclick = ()=> {
+            if(sidebarEl) sidebarEl.classList.toggle('active');
+            if(sidebarOverlayEl) sidebarOverlayEl.classList.toggle('active');
+        };
+        if(sidebarOverlayEl) sidebarOverlayEl.onclick = ()=> {
+            if(sidebarEl) sidebarEl.classList.remove('active');
+            if(sidebarOverlayEl) sidebarOverlayEl.classList.remove('active');
+        };
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({behavior:'smooth'});
+            if(sidebarEl) sidebarEl.classList.remove('active');
+            if(sidebarOverlayEl) sidebarOverlayEl.classList.remove('active');
+        }
+
+        const themeBtn = getEl('theme-btn');
+        if(themeBtn) themeBtn.onclick = function() {
+            const dark = document.body.getAttribute('data-theme')==='dark';
+            document.body.setAttribute('data-theme', dark?'':'dark');
+            const svg = this.querySelector('svg');
+            if(svg) {
+                const path = svg.querySelector('path');
+                if(dark) {
+                    path.setAttribute('d', 'M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z');
+                } else {
+                    path.setAttribute('d', 'M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 0 0 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z');
+                }
+            }
+        };
+
+        function updateSoundIcon() {
+            const soundBtn = getEl('sound-btn');
+            if(soundBtn) {
+                const svg = soundBtn.querySelector('svg');
+                const path = svg.querySelector('path');
+                if(musicPlaying) {
+                    path.setAttribute('d', 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+                } else {
+                    path.setAttribute('d', 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z');
+                }
+            }
+        }
+        const soundBtn = getEl('sound-btn');
+        if(soundBtn) soundBtn.onclick = () => {
+            const bgm = getEl('bgm');
+            if(!bgm) return;
+            if(musicPlaying) {
+                bgm.pause();
+                musicPlaying = false;
+                updateSoundIcon();
+            } else {
+                bgm.play().then(() => {
+                    musicPlaying = true;
+                    updateSoundIcon();
+                }).catch(err => {
+                    console.error('播放失败：', err);
+                    musicPlaying = false;
+                    updateSoundIcon();
+                });
+            }
+        };
+
+        const searchInput = getEl('search-input');
+        if(searchInput) searchInput.addEventListener('input', function(){
+            const kw = this.value.toLowerCase().trim();
+            document.querySelectorAll('.card').forEach(card => {
+                const title = card.querySelector('.card-title')?.innerText.toLowerCase() || '';
+                const tag = card.querySelector('.card-tag')?.innerText.toLowerCase() || '';
+                card.style.display = (title.includes(kw)||tag.includes(kw))?'flex':'none';
+            });
+            document.querySelectorAll('.category-section').forEach(sec => {
+                const vis = sec.querySelectorAll('.card[style*="display: flex"], .card:not([style*="display: none"])');
+                sec.style.display = (vis.length===0 && kw!=='')?'none':'block';
+            });
+        });
+
+        let modalLink = '';
+        function openModal(title, desc, link, icon) {
+            const modalTitle = getEl('modal-title');
+            const modalDesc = getEl('modal-desc');
+            const modalLinkText = getEl('modal-link-text');
+            const modalIcon = getEl('modal-icon');
+            if(modalTitle) modalTitle.innerText = title;
+            if(modalDesc) modalDesc.innerText = desc;
+            if(modalLinkText) modalLinkText.innerText = link;
+            if(modalIcon) modalIcon.src = icon;
+            modalLink = link;
+            const modal = getEl('modal');
+            if(modal) modal.classList.add('active');
+        }
+        function closeModal() { const m = getEl('modal'); if(m) m.classList.remove('active'); }
+        const modalEl = getEl('modal');
+        if(modalEl) modalEl.addEventListener('click', e => { if(e.target === e.currentTarget) closeModal(); });
+
+        window.copyModalLink = function() {
+            navigator.clipboard.writeText(modalLink).then(() => {
+                showToast('链接已复制到剪贴板');
+            }).catch(err => alert('复制失败'));
+        }
+        window.visitModalLink = () => window.open(modalLink, '_blank');
+
+        function openDetail(cat, title, md) {
+            const overlay = getEl('detailOverlay');
+            const breadcrumb = getEl('detailBreadcrumb');
+            const body = getEl('detailBody');
+            if(!overlay) return;
+            if(breadcrumb) breadcrumb.innerHTML = `<span onclick="closeDetail()">首页</span> <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--text-sub)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg> <span>${cat}</span> <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--text-sub)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg> <span>${title}</span>`;
+            if(body) body.innerHTML = marked.parse(md);
+            overlay.classList.add('active');
+        }
+        function closeDetail() { const overlay = getEl('detailOverlay'); if(overlay) overlay.classList.remove('active'); }
+
+        const PASSWORD = 'jc123456';
+        const settingBtn = getEl('setting-btn');
+        if(settingBtn) settingBtn.onclick = () => {
+            const pass = prompt('请输入管理密码');
+            if(pass === PASSWORD) openAdmin();
+            else if(pass !== null) alert('密码错误');
+        };
+
+        function openAdmin() {
+            const panel = getEl('adminPanel');
+            if(!panel) return;
+            panel.classList.add('active');
+            const adminTitle = getEl('adminTitle');
+            const adminQuote = getEl('adminQuote');
+            const adminBgm = getEl('adminBgm');
+            if(adminTitle) adminTitle.value = config.title;
+            if(adminQuote) adminQuote.value = config.quote;
+            if(adminBgm) adminBgm.value = config.bgm;
+            renderAdminSections();
+        }
+        function closeAdmin() { const panel = getEl('adminPanel'); if(panel) panel.classList.remove('active'); }
+
+        function renderAdminSections() {
+            const container = getEl('adminSections');
+            if(!container) return;
+            container.innerHTML = '';
+            config.sections.forEach((sec, sIdx) => {
+                const div = document.createElement('div');
+                div.className = 'admin-section';
+                div.innerHTML = `
+                    <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">
+                        <span>📁 ${sec.title} (${sec.items.length}项)</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="admin-section-body">
+                        <label>分类标题</label><input value="${sec.title}" onchange="config.sections[${sIdx}].title=this.value">
+                        <label>副标题</label><input value="${sec.subtitle}" onchange="config.sections[${sIdx}].subtitle=this.value">
+                        <label>图标链接</label><input value="${sec.icon}" onchange="config.sections[${sIdx}].icon=this.value">
+                        <div id="adminCards_${sIdx}"></div>
+                        <button onclick="addCard(${sIdx})">➕ 添加卡片</button>
+                        <button class="del-btn" onclick="config.sections.splice(${sIdx},1); renderAdminSections();">🗑 删除分类</button>
+                    </div>
+                `;
+                container.appendChild(div);
+                const cardsContainer = document.getElementById('adminCards_'+sIdx);
+                if(cardsContainer) {
+                    sec.items.forEach((item, iIdx) => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'admin-card';
+                        cardDiv.innerHTML = `
+                            <div class="admin-card-header" onclick="this.parentElement.classList.toggle('open')">
+                                <span>📄 ${item.title}</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="admin-card-body">
+                                <label>卡片标题</label><input value="${item.title}" onchange="config.sections[${sIdx}].items[${iIdx}].title=this.value">
+                                <label>标签</label><input value="${item.tag}" onchange="config.sections[${sIdx}].items[${iIdx}].tag=this.value">
+                                <label>图标</label><input value="${item.icon}" onchange="config.sections[${sIdx}].items[${iIdx}].icon=this.value">
+                                <label>类型</label>
+                                <select onchange="changeCardType(${sIdx},${iIdx},this.value)">
+                                    <option value="modal" ${item.type==='modal'?'selected':''}>弹窗复制</option>
+                                    <option value="link" ${item.type==='link'?'selected':''}>直接跳转</option>
+                                    <option value="detail" ${item.type==='detail'?'selected':''}>查看详情</option>
+                                </select>
+                                <div id="cardExtra_${sIdx}_${iIdx}"></div>
+                                <button class="del-btn" onclick="config.sections[${sIdx}].items.splice(${iIdx},1); renderAdminSections();">🗑 删除卡片</button>
+                            </div>
+                        `;
+                        cardsContainer.appendChild(cardDiv);
+                        updateCardExtra(sIdx, iIdx);
+                    });
+                }
+            });
+        }
+
+        function changeCardType(sIdx, iIdx, type) {
+            const item = config.sections[sIdx].items[iIdx];
+            item.type = type;
+            if(type==='modal') {
+                item.modalTitle = item.modalTitle || item.title;
+                item.modalDesc = item.modalDesc || '';
+            }
+            if(type==='detail') item.detailContent = item.detailContent || '';
+            updateCardExtra(sIdx, iIdx);
+        }
+
+        function updateCardExtra(sIdx, iIdx) {
+            const container = document.getElementById(`cardExtra_${sIdx}_${iIdx}`);
+            if(!container) return;
+            const item = config.sections[sIdx].items[iIdx];
+            if(item.type === 'modal') {
+                container.innerHTML = `
+                    <label>弹窗标题</label><input value="${item.modalTitle||''}" onchange="config.sections[${sIdx}].items[${iIdx}].modalTitle=this.value">
+                    <label>弹窗描述</label><input value="${item.modalDesc||''}" onchange="config.sections[${sIdx}].items[${iIdx}].modalDesc=this.value">
+                    <label>弹窗图标</label><input value="${item.modalIcon||''}" onchange="config.sections[${sIdx}].items[${iIdx}].modalIcon=this.value">
+                    <label>链接</label><input value="${item.link||''}" onchange="config.sections[${sIdx}].items[${iIdx}].link=this.value">
+                `;
+            } else if(item.type === 'link') {
+                container.innerHTML = `<label>跳转链接</label><input value="${item.link||''}" onchange="config.sections[${sIdx}].items[${iIdx}].link=this.value">`;
+            } else if(item.type === 'detail') {
+                container.innerHTML = `<label>Markdown内容</label><textarea rows="4" onchange="config.sections[${sIdx}].items[${iIdx}].detailContent=this.value">${item.detailContent||''}</textarea>`;
+            }
+        }
+
+        function addSection() {
+            config.sections.push({ id:'section'+Date.now(), title:'新分类', subtitle:'副标题', icon: config.logo, items:[] });
+            renderAdminSections();
+        }
+        function addCard(sIdx) {
+            config.sections[sIdx].items.push({ type:'modal', title:'新卡片', tag:'标签', icon: config.logo, link:'https://', modalTitle:'新卡片', modalDesc:'', modalIcon: config.logo });
+            renderAdminSections();
+        }
+
+        function applyAdminChanges() {
+            config.title = getEl('adminTitle')?.value || config.title;
+            config.quote = getEl('adminQuote')?.value || config.quote;
+            config.bgm = getEl('adminBgm')?.value || config.bgm;
+            renderAll();
+            closeAdmin();
+        }
+
+        function downloadJSON() {
+            applyAdminChanges(); // 先保存修改
+            const jsonStr = JSON.stringify(config, null, 2);
+            const blob = new Blob([jsonStr], {type:'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'config.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+    </script>
+</body>
+</html>
